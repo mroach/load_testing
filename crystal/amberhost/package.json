@@ -1,0 +1,15 @@
+{
+  "name": "derp",
+  "version": "0.1.0",
+  "description": "Derp with Amber",
+  "private": true,
+  "author": "Michael Roach",
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "true",
+    "watch": "true",
+    "release": "true",
+    "test": "true"
+  },
+  "devDependencies": {}
+}

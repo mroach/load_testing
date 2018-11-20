@@ -1,0 +1,2 @@
+module Hanamihost
+end
