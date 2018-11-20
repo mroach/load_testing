@@ -53,3 +53,5 @@ Then benchmark each one:
 # benchmark phoenix
 k6 run -e PORT=4000 bench.js
 ```
+
+![k6 output](docs/k6_output.png)
