@@ -24,7 +24,7 @@ HOST = "127.0.0.1"
 PORT = 7000
 
 WRK_CONNECTIONS = ENV.fetch("WRK_CONNECTIONS", "10").to_i
-WRK_DURATION = ENV.fetch("WRK_CONNECTIONS", "5s")
+WRK_DURATION = ENV.fetch("WRK_DURATION", "5s")
 
 puts "System has #{SYSTEM_CPUS} CPUs. Default workers: #{DEFAULT_WORKERS}"
 
