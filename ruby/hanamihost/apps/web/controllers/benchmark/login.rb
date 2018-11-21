@@ -1,6 +1,6 @@
 module Web
   module Controllers
-    module Authentication
+    module Benchmark
       class Login
         include Web::Action
 

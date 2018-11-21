@@ -28,12 +28,14 @@ Amber::Server.configure do
   end
 
   routes :web do
-    get "/", HomeController, :index
+    # get "/", HomeController, :index
   end
 
   routes :api do
-    get "/warmup", SystemController, :warmup
-    post "/login", AuthenticationController, :login
+    get "/warmup", BenchmarkController, :warmup
+    get "/alive", BenchmarkController, :alive
+    get "/platform", BenchmarkController, :platform
+    post "/login", BenchmarkController, :login
   end
 
   routes :static do

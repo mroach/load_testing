@@ -10,13 +10,16 @@ defmodule PhoenixhostWeb.Router do
   end
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug :accepts, ["json", "text"]
   end
 
   scope "/", PhoenixhostWeb do
     pipe_through :api
-    post "/login", AuthenticationController, :login
-    get "/warmup", SystemController, :warmup
+
+    get "/warmup", BenchmarkController, :warmup
+    get "/alive", BenchmarkController, :alive
+    get "/platform", BenchmarkController, :platform
+    post "/login", BenchmarkController, :login
   end
 
   # Other scopes may use custom stacks.
