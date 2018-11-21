@@ -20,6 +20,9 @@ rescue Errno::ENOENT
 end
 
 DEFAULT_WORKERS = [(SYSTEM_CPUS * 0.8).floor, 3].max
+
+# Default way to connect to the app server. PORT will also be used for starting
+# local app servers on the correct port so we know where to find them
 HOST = "127.0.0.1"
 PORT = 7000
 
@@ -28,32 +31,32 @@ WRK_DURATION = ENV.fetch("WRK_DURATION", "5s")
 
 puts "System has #{SYSTEM_CPUS} CPUs. Default workers: #{DEFAULT_WORKERS}"
 
-Test = Struct.new(:dir, :cmd, :env, :host, :port) do
-  def initialize(dir, cmd, env: {}, host: HOST, port: PORT)
-    super(dir, cmd, env, host, port)
+Test = Struct.new(:id, :dir, :cmd, :env, :host, :port) do
+  def initialize(id, dir: nil, cmd: nil, env: {}, host: HOST, port: PORT)
+    super(id, dir, cmd, env, host, port)
   end
 end
 
 tests = {
-  rails_w2: Test.new(
-    "ruby/railshost",
-    "bundle exec puma -w 2 -p #{PORT} -e production --preload"),
+  Test.new(:rails_w2,
+    dir: "ruby/railshost",
+    cmd: "bundle exec puma -w 2 -p #{PORT} -e production --preload"),
 
   rails_w4: Test.new(
-    "ruby/railshost",
-    "bundle exec puma -w 4 -p #{PORT} -e production --preload"),
+    dir: "ruby/railshost",
+    cmd: "bundle exec puma -w 4 -p #{PORT} -e production --preload"),
 
   rails_w6: Test.new(
-    "ruby/railshost",
-    "bundle exec puma -w 6 -p #{PORT} -e production --preload"),
+    dir: "ruby/railshost",
+    cmd: "bundle exec puma -w 6 -p #{PORT} -e production --preload"),
 
   hanami: Test.new(
-    "ruby/hanamihost",
-    "bundle exec puma -w #{DEFAULT_WORKERS} -p #{PORT} -e production --preload"),
+    dir: "ruby/hanamihost",
+    cmd: "bundle exec puma -w #{DEFAULT_WORKERS} -p #{PORT} -e production --preload"),
 
   phoenix: Test.new(
-    "elixir/phoenixhost",
-    "mix phx.server",
+    dir: "elixir/phoenixhost",
+    cmd: "mix phx.server",
     env: {"MIX_ENV" => "prod", "PORT" => PORT.to_s}),
 
   amber: Test.new(
@@ -85,21 +88,23 @@ def start_server(name, spec)
   log_file = File.open("results/log/#{name}_server_output.log", "w+")
 
   puts "Starting #{name} server: #{spec.dir}> #{env_desc} #{spec.cmd}"
-  Dir.chdir(spec.dir) do
-    return Process.spawn(spec.env, spec.cmd, out: log_file)
-  end
+  Process.spawn(spec.env, spec.cmd, chdir: spec.dir, out: log_file)
 end
 
 tests.each do |name, spec|
   puts "\n---------- #{name} ----------\n\n"
-  pid = start_server(name, spec)
 
-  unless started_after_waiting?(limit: 20)
-    STDERR.puts "Failed to get warmup response from #{name} server"
-    next
+  if spec.cmd.present?
+    pid = start_server(name, spec)
+    unless started_after_waiting?(limit: 20)
+      STDERR.puts "Failed to get warmup response from #{name} server"
+      next
+    end
+
+    puts "Server running at #{pid}"
+  else
+    pid = nil
   end
-
-  puts "Server running at #{pid}"
 
   platform = Net::HTTP.get(URI("http://#{HOST}:#{PORT}/platform"))
   puts "Platform is #{platform}"
@@ -111,9 +116,12 @@ tests.each do |name, spec|
     "wrk -c #{WRK_CONNECTIONS} -d #{WRK_DURATION} -s bench.lua http://#{HOST}:#{PORT}"
   )
 
-  puts "Shutting down server #{pid}"
-  Process.kill("HUP", pid)
-  puts "Waiting for #{name} server (#{pid}) to shutdown..."
-  Process.wait(pid)
+  unless pid == nil
+    puts "Shutting down server #{pid}"
+    Process.kill("HUP", pid)
+    puts "Waiting for #{name} server (#{pid}) to shutdown..."
+    Process.wait(pid)
+  end
+
   puts "Done"
 end
