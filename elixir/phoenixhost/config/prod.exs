@@ -10,9 +10,7 @@ use Mix.Config
 # which you should run after static files are built and
 # before starting your production server.
 config :phoenixhost, PhoenixhostWeb.Endpoint,
-  http: [:inet6, port: System.get_env("PORT") || 4000],
-  url: [host: "0.0.0.0", port: 4000],
-  cache_static_manifest: "priv/static/cache_manifest.json"
+  http: [port: System.get_env("PORT") || 4000]
 
 # Do not print debug messages in production
 config :logger, level: :info
@@ -68,4 +66,4 @@ config :logger, level: :info
 
 # Finally import the config/prod.secret.exs which should be versioned
 # separately.
-import_config "prod.secret.exs"
+# import_config "prod.secret.exs"
