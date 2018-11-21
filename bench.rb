@@ -2,7 +2,23 @@
 
 require "net/http"
 
-SYSTEM_CPUS = `sysctl -n hw.ncpu`.to_i
+cat /proc/cpuinfo | grep "^model name" | cut -d: -f2
+
+SYSTEM_CPUS = case RUBY_PLATFORM
+when /linux/
+  `nproc`.to_i
+when /darwin/
+  `sysctl -n hw.ncpu`.to_i
+else 1
+end
+
+# Detect if `wrk` is available
+begin
+  Process.wait(Process.spawn("wrk --help"))
+rescue Errno::ENOENT
+  abort "Can't find the wrk binary. Is it installed? Aborting"
+end
+
 DEFAULT_WORKERS = [(SYSTEM_CPUS * 0.8).floor, 3].max
 HOST = "127.0.0.1"
 PORT = 7000
