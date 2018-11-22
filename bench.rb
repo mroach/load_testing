@@ -72,12 +72,16 @@ end
 
 def started_after_waiting?(limit:)
   current = 0
+  print "Waiting #{limit}s for app to warmup..."
   begin
-    return true if alive?
-    puts "Waiting for app to warmup... (#{current}/#{limit})"
+    if alive?
+      puts "DONE"
+      return true
+    end
     sleep 1
     current += 1
   end until current >= limit
+  puts "FAILED"
   return false
 end
 
@@ -117,14 +121,14 @@ tests.each do |name, spec|
   end
 
   platform = Net::HTTP.get(URI("http://#{HOST}:#{PORT}/platform"))
-  puts "Platform is #{platform}"
+  puts "Platform is \e[36m#{platform}\e[0m"
 
   result_file = "results/#{name}_bench_results.json"
+  wrk_log_file = File.open("results/log/#{name}_wrk_output.log", "w+")
+  cmd = "wrk -c #{WRK_CONNECTIONS} -d #{WRK_DURATION} -s bench.lua http://#{HOST}:#{PORT}"
 
-  Kernel.system(
-    {"WRK_JSON_OUT" => result_file, "WRK_JSON_DESC" => platform},
-    "wrk -c #{WRK_CONNECTIONS} -d #{WRK_DURATION} -s bench.lua http://#{HOST}:#{PORT}"
-  )
+  puts "$ #{cmd}"
+  Kernel.system({"WRK_JSON_OUT" => result_file, "WRK_JSON_DESC" => platform}, cmd, out: wrk_log_file)
 
   shutdown_server(pid) unless pid.nil?
 
