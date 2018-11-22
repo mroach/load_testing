@@ -2,8 +2,6 @@
 
 require "net/http"
 
-cat /proc/cpuinfo | grep "^model name" | cut -d: -f2
-
 SYSTEM_CPUS = case RUBY_PLATFORM
 when /linux/
   `nproc`.to_i
