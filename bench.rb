@@ -85,8 +85,20 @@ def start_server(name, spec)
   env_desc = spec.env.map { |k,v| "#{k}=#{v}" }.join(" ")
   log_file = File.open("results/log/#{name}_server_output.log", "w+")
 
-  puts "Starting #{name} server: #{spec.dir}> #{env_desc} #{spec.cmd}"
-  Process.spawn(spec.env, spec.cmd, chdir: spec.dir, out: log_file)
+  puts "Starting server: #{spec.dir} $ #{env_desc} #{spec.cmd}"
+
+  # Process grouping was required for Amber in production.
+  # Otherwise it would only shutdown the parent process but not the children.
+  # The only way it shutdown properly was SIGTERM with process grouping.
+  # Return the pid as a negative number to indicate it's a process group
+  -Process.spawn(spec.env, spec.cmd, chdir: spec.dir, out: log_file, pgroup: true)
+end
+
+def shutdown_server(pid)
+  pid_type = pid < 0 ? "process group" : "process"
+  Process.kill("TERM", pid)
+  puts "Waiting for server #{pid_type} (#{pid}) to shutdown..."
+  Process.wait(pid)
 end
 
 tests.each do |name, spec|
@@ -114,12 +126,7 @@ tests.each do |name, spec|
     "wrk -c #{WRK_CONNECTIONS} -d #{WRK_DURATION} -s bench.lua http://#{HOST}:#{PORT}"
   )
 
-  unless pid == nil
-    puts "Shutting down server #{pid}"
-    Process.kill("HUP", pid)
-    puts "Waiting for #{name} server (#{pid}) to shutdown..."
-    Process.wait(pid)
-  end
+  shutdown_server(pid) unless pid.nil?
 
   puts "Done"
 end
