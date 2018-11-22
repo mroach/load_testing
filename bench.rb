@@ -29,14 +29,14 @@ WRK_DURATION = ENV.fetch("WRK_DURATION", "5s")
 
 puts "System has #{SYSTEM_CPUS} CPUs. Default workers: #{DEFAULT_WORKERS}"
 
-Test = Struct.new(:id, :dir, :cmd, :env, :host, :port) do
-  def initialize(id, dir: nil, cmd: nil, env: {}, host: HOST, port: PORT)
-    super(id, dir, cmd, env, host, port)
+Test = Struct.new(:dir, :cmd, :env, :host, :port) do
+  def initialize(dir: nil, cmd: nil, env: {}, host: HOST, port: PORT)
+    super(dir, cmd, env, host, port)
   end
 end
 
 tests = {
-  Test.new(:rails_w2,
+  rails_w2: Test.new(
     dir: "ruby/railshost",
     cmd: "bundle exec puma -w 2 -p #{PORT} -e production --preload"),
 
@@ -58,8 +58,8 @@ tests = {
     env: {"MIX_ENV" => "prod", "PORT" => PORT.to_s}),
 
   amber: Test.new(
-    "crystal/amberhost",
-    "bin/amberhost_prod",
+    dir: "crystal/amberhost",
+    cmd: "bin/amberhost_prod",
     env: {"AMBER_ENV" => "production", "PORT" => PORT.to_s})
 }
 
