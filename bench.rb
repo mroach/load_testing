@@ -12,7 +12,7 @@ end
 
 # Detect if `wrk` is available
 begin
-  Process.wait(Process.spawn("wrk --help"))
+  Process.wait(Process.spawn("wrk --help", out: File.open("/dev/null", "w")))
 rescue Errno::ENOENT
   abort "Can't find the wrk binary. Is it installed? Aborting"
 end
