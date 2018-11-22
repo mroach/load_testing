@@ -104,7 +104,7 @@ end
 tests.each do |name, spec|
   puts "\n---------- #{name} ----------\n\n"
 
-  if spec.cmd.present?
+  if spec.cmd
     pid = start_server(name, spec)
     unless started_after_waiting?(limit: 20)
       STDERR.puts "Failed to get warmup response from #{name} server"
