@@ -8,7 +8,7 @@ class BenchmarkController < ApplicationController
   end
 
   def platform
-    render plain: "Rails #{Rails.version}/Ruby #{RUBY_VERSION}"
+    render plain: "Rails #{Rails.version}/Ruby #{RUBY_VERSION} (#{Rails.env})"
   end
 
   def login

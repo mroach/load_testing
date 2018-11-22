@@ -11,7 +11,7 @@ defmodule PhoenixhostWeb.BenchmarkController do
 
   def platform(conn, _params) do
     {:ok, version} = :application.get_key(:phoenix, :vsn)
-    text conn, "Phoenix #{version}/Elixir #{System.version}/OTP #{System.otp_release}"
+    text conn, "Phoenix #{version}/Elixir #{System.version}/OTP #{System.otp_release} (#{Mix.env})"
   end
 
   def login(conn, %{"user" => user, "pass" => pass}) do

@@ -8,7 +8,7 @@ class BenchmarkController < ApplicationController
   end
 
   def platform
-    "Amber #{Amber::VERSION}/Crystal #{Crystal::VERSION}"
+    "Amber #{Amber::VERSION}/Crystal #{Crystal::VERSION} (#{Amber.env})"
   end
 
   def login
