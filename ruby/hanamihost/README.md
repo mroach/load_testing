@@ -2,32 +2,14 @@
 
 Welcome to your new Hanami project!
 
-## Setup
+## Development server
 
-How to run tests:
-
-```
-% bundle exec rake
+```shell
+bundle exec hanami server
 ```
 
-How to run the development console:
+## Production server for benchmarking
 
+```shell
+bundle exec puma -w 3 -p 7000 -e production --preload
 ```
-% bundle exec hanami console
-```
-
-How to run the development server:
-
-```
-% bundle exec hanami server
-```
-
-How to prepare (create and migrate) DB for `development` and `test` environments:
-
-```
-% bundle exec hanami db prepare
-
-% HANAMI_ENV=test bundle exec hanami db prepare
-```
-
-Explore Hanami [guides](http://hanamirb.org/guides/), [API docs](http://docs.hanamirb.org/1.3.0/), or jump in [chat](http://chat.hanamirb.org) for help. Enjoy! 🌸

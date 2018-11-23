@@ -4,54 +4,30 @@ This project aims to compare the load capacity of different web frameworks and l
 
 Frameworks available for testing:
 
-* Rails 5.2
+* Rails 5.2 (Ruby)
 * Hanami (Ruby)
 * Amber (Crystal)
 * Phoenix (Elixir)
 
-## Setup
+## Pre-requisites
 
-To run the benchmarks, you need [k6](https://k6.io) setup on your system.
+To run the full benchmarking suite, you'll need the following installed:
 
-```shell
-brew tap loadimpact/k6
-brew install k6
-```
-
-### nginx
-
-To establish a baseline/control benchmark, you can install nginx and use
-the config file in the `nginx/` dir as a server. It returns a string directly
-from server configuration so it's as fast as an HTTP server could be.
-
-### App setup
-
-Each app has its own `README` file to explain how to get it running.
+* Ruby 2.5.x
+* Crystal
+* Elixir
+* nginx
 
 ## Running the benchmarks
 
-The strategy is that each app runs on a different port, so when you run the benchmark
-you simply set the `PORT` environment variable to connect to the right app.
+If you're running everything on your local system, you don't have much to do.
 
-> TODO: Orchestrate a more clean way of doing this. Start commands and ports
-> could come from a config file and then make a small command like:
-> `./bench.sh phoenix
+See the `README` files in each app's directory to see about installing dependencies.
 
-Here's an example of how you'd start all the apps. Each in their own tmux window
-for example:
+Then, just run:
 
 ```shell
-cd ruby/hanamihost; bundle exec puma -p 2301 -e production -w 4
-cd ruby/railshost; bundle exec puma -p 3001 -e production -w 4
-cd crystal/amberhost; AMBER_ENV=production PORT=5000 amber watch
-cd elixir/phoenixhost; env MIX_ENV=prod PORT=4000 phx.server
+./bench.rb
 ```
 
-Then benchmark each one:
-
-```shell
-# benchmark phoenix
-k6 run -e PORT=4000 bench.js
-```
-
-![k6 output](docs/k6_output.png)
+The results will be in the `results/` dir in JSON format.
