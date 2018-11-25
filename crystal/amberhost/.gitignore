@@ -5,8 +5,6 @@
 /.vscode/
 /tmp/
 .env
-.encryption_key
-production.yml
 .DS_Store
 /bin/
 /node_modules
