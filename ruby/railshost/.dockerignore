@@ -1,0 +1,7 @@
+.git
+.DS_Store
+Dockerfile
+tmp/
+test/
+log/
+db/*.sqlite3
