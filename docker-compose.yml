@@ -1,0 +1,30 @@
+version: "2.4"
+services:
+  rails:
+    build: ruby/railshost
+    cpus: 1.5
+    mem_limit: 512m
+  hanami:
+    build: ruby/hanamihost
+    cpus: 1.5
+    mem_limit: 512m
+  phoenix:
+    build: elixir/phoenixhost
+    cpus: 1.5
+    mem_limit: 512m
+  amber:
+    build: crystal/amberhost
+    cpus: 1.5
+    mem_limit: 512m
+
+  nginx:
+    image: nginx:1-alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/bench_server.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - rails
+      - hanami
+      - phoenix
+      - amber

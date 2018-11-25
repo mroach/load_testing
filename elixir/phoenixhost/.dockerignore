@@ -3,3 +3,4 @@ _build
 !_build/prod/rel
 deps
 test
+Dockerfile
